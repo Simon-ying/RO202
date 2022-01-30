@@ -1,8 +1,8 @@
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Kruskal {
-	
 	public static void main(String[] args) {
 		
 		/* Create a graph which contains nodes a, b, c, d, e, f, g */
@@ -53,10 +53,11 @@ public class Kruskal {
 		
 		/* Sort the edges by increasing weight */
 		Collections.sort(edges);
-		int selected=1;
-		while(selected<g.n)
+		int selected = 1;
+
+		while(selected < g.n && edges.size()>0)
 		{
-			if (!tree.createACycle(edges.get(0)));
+			if (!tree.createACycle(edges.get(0)))
 			{
 				tree.addEdge(edges.get(0));
 				selected++;
@@ -64,6 +65,7 @@ public class Kruskal {
 			edges.remove(0);
 		}
 		//TODO: mettre votre code ici
-		// if(tree.createACycle(edges.get(0)))
 		return tree;
+	}
 }
+

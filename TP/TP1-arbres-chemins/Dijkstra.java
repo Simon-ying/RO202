@@ -64,13 +64,15 @@ public class Dijkstra {
 			if(v != r)
 				pi[v] = Double.POSITIVE_INFINITY;
 
+
 		// Mettre votre code ici
 		for (int j=1; j<g.n; j++)
 		{
 			for (int k=0; k<g.n; k++)
 			{
-				if (k != pivot && g.adjacency[pivot][k] != 0)
+				if (!V2.contains(k) && g.adjacency[pivot][k] != 0)
 				{
+					System.out.println(k);
 					if (pi[pivot] + g.adjacency[pivot][k] < pi[k])
 					{
 						pi[k] = pi[pivot] + g.adjacency[pivot][k];
@@ -79,9 +81,9 @@ public class Dijkstra {
 					}
 				}
 			}
-
-			double temp = 0;
-			for (int i=0; i<pi.length; i++)
+			System.out.println("-------------end--------------");
+			double temp = Double.POSITIVE_INFINITY;
+			for (int i=1; i<pi.length; i++)
 			{
 				if(pi[i] < temp && !V2.contains(i))
 				{
@@ -90,12 +92,14 @@ public class Dijkstra {
 				}
 
 			}
+			System.out.println("new pivot: " + pivot);
 			V2.add(pivot);
 		}
 		Graph tree = new Graph(g.nodes);
 		for (int i = 0; i < g.n; i++)
 		{
-			if (pi[i] != 0.0)
+			if (pi[i] != i)
+				System.out.println(pred[i] + " " + i + " " + g.adjacency[pred[i]][i]);
 				tree.addEdge(pred[i], i, g.adjacency[pred[i]][i]);
 		}
 		return tree;
