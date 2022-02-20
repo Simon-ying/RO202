@@ -1,6 +1,6 @@
-# 2 Flots et coupes  
+## 2 Flots et coupes  
 
-## Définition
+### 2.1 Définition
 
 - Flux
 - Flot 
@@ -11,7 +11,7 @@
 - Flot maximal
 - Chaîne améliorante  
 
-## L’algorithme de Ford-Fulkerson  
+### 2.2 L’algorithme de Ford-Fulkerson  
 
 **Données :** $G = (V, A, C)$
 Établir un flot admissible (complet de préférence)

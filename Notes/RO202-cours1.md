@@ -1,8 +1,8 @@
 # Recherche Opérationnelle
 
-## Optimisation dans les graphes
+## 1 Optimisation dans les graphes
 
-### Vocabulaire et définition
+### 1.1 Vocabulaire et définition
 
 - graphes : orienté, simple, multigraphe, valué
 
@@ -12,7 +12,7 @@
 
 à compléter ...
 
-### Algorithme de Kruskal
+### 1.2 Algorithme de Kruskal
 
 **Données :** $G = (V, E, p)$ : graphe non orienté valué
 
@@ -40,7 +40,7 @@
 
 
 
-### Cheminement
+### 1.3 Cheminement
 
 <font color=red>Théorème :</font> Il existe un chemin de longueur minimale finie de $r$ à tous les sommets du graphe si et seulement si $r$ est une racine du graphe et le graphe ne contient pas de circuit absorbant  
 
