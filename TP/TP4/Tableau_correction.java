@@ -1,3 +1,4 @@
+package other;
 
 
 public class Tableau {
@@ -7,9 +8,7 @@ public class Tableau {
 
 	/** Number of constraints */
 	public int m;
-	
-	public double epsilon = 0.00001;
-	
+
 	public double[][] A;
 	public double[] b;
 	public double[] c;
@@ -78,82 +77,19 @@ public class Tableau {
 
 		return new Tableau(A, b, c, true); 
 	}
-	
-	public static Tableau ex41() {
-
-		double[][] A = new double[][] {
-			{5, 3},
-			{2, 3},
-			{1, 3}
-		};
-
-		double[] c = new double[]{8, 6};
-		double[] b = new double[]{30, 24, 18};
-
-		return new Tableau(A, b, c, false); 
-	}
-	
-	public static Tableau ex41d() {
-
-		double[][] A = new double[][] {
-			{5, 2, 1, 0, 0},
-			{3, 3, 3, 0, 0}
-		};
-
-		double[] c = new double[]{30, 24, 18, 0, 0};
-		double[] b = new double[]{8, 6};
-
-		return new Tableau(A, b, c, true); 
-	}
-	
-	public static Tableau ex42() {
-
-		double[][] A = new double[][] {
-			{-3, 2},
-			{-1, 2},
-			{1, 1}
-		};
-
-		double[] c = new double[]{1, 2};
-		double[] b = new double[]{2, 4, 5};
-
-		return new Tableau(A, b, c, false); 
-	}
-	
-	public static Tableau ex42d() {
-
-		double[][] A = new double[][] {
-			{-3, -1, 1, 0, 0},
-			{2, 2, 1, 0, 0}
-		};
-
-		double[] c = new double[]{2, 4, 5, 0, 0};
-		double[] b = new double[]{1, 2};
-
-		return new Tableau(A, b, c, true); 
-	}
 
 	public static void main(String[] args) {
-		/*
-		 * Explications:
-		 * ex41 : premier problème de l'exercice 4
-		 * ex41d : problème dual de ex41
-		 * ex42 : deuxième problème de l'exercice 4
-		 * ex4d : problème dual de ex42
-		 * 
-		 * En utilisant le théorème dual fort, on peut montrer que l'on obtient des solutions optimales
-		 */
+
 		/* Si le problème n'est pas sous forme normale, il faut le transformer */
-		boolean normalForm = true;
+		boolean normalForm = false;
+		System.out.println("test");
 
 		/* Si on résout un problème sous forme normale */
 		if(normalForm) {
 
 			/**** 1st case - PL Ax = b and a basis is provided (no slack variable added to the problem) */
-			// Tableau t1 = ex2();
-			// Tableau t1 = ex41d();
-			Tableau t1 = ex42d();
-			t1.basis = new int[] {0, 2, 5};
+			Tableau t1 = examenTheorieDesJeux();
+			t1.basis = new int[] {3, 4, 5};
 			t1.applySimplex();
 		}
 		
@@ -161,9 +97,7 @@ public class Tableau {
 		else {
 
 			/**** 2nd case - PL Ax <= b, add slack variable and use them as a basis */
-//			Tableau t2 = ex1();
-			Tableau t2 = ex41();
-//			Tableau t2 = ex42();
+			Tableau t2 = examen2020();
 			t2.addSlackAndSolve();
 			t2.displaySolution();
 		}
@@ -197,6 +131,14 @@ public class Tableau {
 			System.out.println("Initial array: ");
 			display();
 		}
+		
+		/* Perturbate each value of b to avoid dividing by zero whenever there are degenerations */
+		double eps = 1E-7;
+		
+		for(int i = 0; i < m; i++) {
+			b[i] += eps;
+			eps *= 0.1;
+		}
 
 		/* While the basic solution can be improved, perform a pivot step */
 		while(pivot()) {
@@ -218,9 +160,10 @@ public class Tableau {
 	 */
 	public boolean pivot() {
 
-		/* 1) Mettre le tableau en forme canonique 
+		/* 1) Canonical form 
+		 *   Set the tableau in canonical form (so that the basis matrix has 1 on its diagonal and 0 everywhere else)
 		 *
-		 * Description des variables à utiliser (ne pas les définir, elles le sont déjà dans cette classe) :
+		 * Description des variables à utiliser :
 		 * - A[][] : matrice des contraintes (taille m * n)
 		 * - b[] : coefficients du membre de droite (taille m)
 		 * - c[] : coefficients de l'objectif (taille n)
@@ -231,51 +174,71 @@ public class Tableau {
 		 *
 		 * Pseudo-code:
 		 *
-		 *  l1 - Pour chaque contrainte i (i.e., pour chaque ligne i de A) faire
-		 *       l1.1 - Multiplier la contrainte i pour fixer à 1 le coefficient en ligne i et en colonne basis[i].
-		 *       l1.2 - Utiliser une combinaison linéaire de la contrainte i et des autres contraintes pour fixer les autres coefficients de la colonne basis[i] à 0.
-		 *       l1.3 - Utiliser une combinaison linéaire de la contrainte i et de l'objectif c pour fixer c[basis[i]] à 0
+		 * l1 - Pour chaque contrainte i (i.e., pour chaque ligne i de A)
+		 *       l2 - Utiliser une combinaison linéaire de la contrainte i pour fixer à 1 le coefficient en ligne i et en colonne basis[i]
+		 *       l3 - Utiliser une combinaison linéaire de la contrainte i et des autres contraintes pour fixer les autres coefficients de la colonne basis[i] à 0
+		 *       l4 - Utiliser une combinaison linéaire de la contrainte i et de c pour fixer c[basis[i]] à 0
 		 *
 		 * Remarques :
-		 * - dans l1.1 et l1.2, ne pas oublier de mettre à jour b ;
-		 * - dans l1.3, ne pas oublier de mettre à jour bestObjective.
+		 * - dans l2 et l3, ne pas oublier de mettre à jour b
+		 * - dans l4, ne pas oublier de mettre à jour bestObjective
 		 *  		    
 		 */
 
-                 // TODO
-		for (int iraw=0; iraw<m; iraw++) {
-			double div = A[iraw][basis[iraw]];
-			for (int jcol=0; jcol<n; jcol++) {
-				A[iraw][jcol] /= div;
+		/* For each variable in the base (remark: the variable at index baseId of the base is associated with constraint baseId) */
+		for(int baseId = 0; baseId < m; baseId++) {
+
+			/* Get the coefficient in the column of its corresponding base variable */
+			double baseCoefficient = A[baseId][basis[baseId]];
+
+			/* For each coefficient of this constraint */
+			for(int c = 0; c < n; c++)
+				
+				/* Divide by the coefficient (enable to get 1 in the column of its corresponding base variable) */
+				A[baseId][c] /= baseCoefficient;
+			
+			/* Also divide the RHS */
+			b[baseId] /= baseCoefficient;
+
+			/* For each constraint (i.e., each row of the column basis[baseId]) */
+			for(int constraintId = 0; constraintId < m; constraintId++) {
+
+				/* If coefficient [constraintId][baseId] must be set to 0 */
+				if(constraintId != baseId) {
+
+					double coefficient = A[constraintId][basis[baseId]];
+
+					/* For each coefficient of this constraint */
+					for(int colId = 0; colId < n; colId++) 
+
+						A[constraintId][colId] -= coefficient * A[baseId][colId];
+
+					b[constraintId] -= coefficient * b[baseId];
+
+				} 
 			}
-			b[iraw] /= div;
-			for (int ai=0; ai<m; ai++) {
-				if (ai != iraw) {
-					double mul = (A[ai][basis[iraw]] / A[iraw][basis[iraw]]);
-					for (int j=0; j<n; j++) {
-						A[ai][j] -= A[iraw][j] * mul;
-					}
-					b[ai] -= b[iraw] * mul;
-				}
-			}
-			double mul = c[basis[iraw]] / A[iraw][basis[iraw]];
-			for (int jcol=0; jcol<n; jcol++) {
-				c[jcol] -= A[iraw][jcol] * mul;
-			}
-			bestObjective -= b[iraw] * mul;
+
+			double objectiveCoefficient = c[basis[baseId]];
+
+			/* For each coefficient of the objective */
+			for(int colId = 0; colId < n; colId++) 
+
+				c[colId] -= objectiveCoefficient * A[baseId][colId];
+
+			bestObjective += objectiveCoefficient * b[baseId];
 		}
-	    
+		
 		if(DISPLAY_SIMPLEX_LOGS) {
 			System.out.println("Tableau in canonical form");
 			display();
 		}
 
-		/* 2 - Obtenir la nouvelle base */
+		/* 2 - Get the new base */
 
-		/* 2.1 - Obtenir la variable entrant en base
+		/* 2.1 - Get the variable entering the base 
 		 * 
-		 * Indication : Trouver la variable ayant le meilleur coût réduit.
-		 *
+		 * Indication : Trouver la variable ayant le meilleur coût réduit
+		 * 
 		 * Remarque : 
 		 *   - Le traitement n'est pas le même si le problème est une maximisation ou une minimisation (utiliser la variable isMinimization)
 		 *   - Comme les calculs machine sont approchés, il faut toujours faire des comparaisons numériques à un epsilon prêt. Par exemple :
@@ -283,53 +246,61 @@ public class Tableau {
 		 *   	- si vous voulez tester si a est inférieur à 1, il faut écrire : a < 1 - epsilon (sinon la condition serait vérifiée pour a = 0.99999999999).
 		 *   
 		 */
+		int bestEnteringVar = -1;
+		double bestReducedCost = 0.0;
 
-		// TODO
-		int entr_index = -1;
-		int sort_index = -1;
-		double res = isMinimization ? Double.MAX_VALUE : 0;
-		for (int icol=0; icol<n; icol++) {
-			if (isMinimization) {
-				if (c[icol] < 0-epsilon && c[icol] <= res-epsilon ) {
-					entr_index = icol;
-					res = c[icol];
-				}
+		for(int i = 0; i < n; i++)
+			if((!isMinimization && c[i] > 1E-6 &&  c[i] > bestReducedCost) 
+					|| (isMinimization && c[i] < -1E-6 && c[i] < bestReducedCost )) {
+				bestEnteringVar = i;
+				bestReducedCost = c[i];
 			}
-			else {
-				if (c[icol] > 0+epsilon && c[icol] >= res+epsilon) {
-					entr_index = icol;
-					res = c[icol];
-				}
-			}
-		}
-		
-		
-		if (entr_index == -1) return false;
-		/* 2.2 - Obtenir la variable sortant de la base
+
+		/* 2.2 - Get the variable leaving the base 
 		 * 
 		 * Pseudo-code
 		 * 	Soit e l'indice de la variable entrant en base (trouvée en 2.1).
-		 * 	l1 - Déterminer la contrainte i ayant un coefficient positif en colonne e qui minimise le ratio b[i] / A[i][e].
-		 *      l2 - Mettre à jour la base (retirer i et ajouter e).
+		 * 	l1 - Déterminer la contrainte i ayant un coefficient positif ou nul en colonne e qui minimise le ratio b[i] / A[i][e]
+		 *      l2 - Mettre à jour la base
 		 * 
 		 * Remarque : il faut une nouvelle fois faire des comparaisons à epsilon prêt.
 		 */
+		if(bestEnteringVar != -1) {
 
-		// TODO
-		res = Double.MAX_VALUE;
-		for (int jraw=0; jraw<m; jraw++) {
-			if (b[jraw] / A[jraw][entr_index] > epsilon) {
-				if (b[jraw] / A[jraw][entr_index] < res - epsilon) {
-					res = b[jraw] / A[jraw][entr_index];
-					sort_index = jraw;
+			if(DISPLAY_SIMPLEX_LOGS)
+				System.out.println("x" + (bestEnteringVar+1) + " enters the base.");
+			
+			
+
+			int bestLeavingVar = -1;
+			double bestRatio = Double.POSITIVE_INFINITY;
+
+			for(int constraintId = 0; constraintId < m; constraintId++) {
+				double ratio = b[constraintId] / A[constraintId][bestEnteringVar];
+
+				/* If the ratio is positive and lower than the best known ratio
+				 * or if the ratio is null and if the x coefficient is positive or null
+				 * (in that last case, the variable cannot be increased)
+				 */
+				if(ratio > 1E-6 && ratio < bestRatio
+						|| Math.abs(ratio) < 1E-6 && A[constraintId][bestEnteringVar] > -1E-6) {
+					bestRatio = ratio;
+					bestLeavingVar = basis[constraintId];
 				}
 			}
-		}
-		if (sort_index == -1) return false;
-		basis[sort_index] = entr_index;
-		
+
+			if(DISPLAY_SIMPLEX_LOGS)
+				System.out.println("x" + (bestLeavingVar+1) + " leaves the base.");
+
+			for(int i = 0; i < m; i++)
+				if(basis[i] == bestLeavingVar)
+					basis[i] = bestEnteringVar;
+
+		}			
+
 		/* 3 - Retourner vrai si une nouvelle base est trouvée et faux sinon */
-		return true;
+		return bestEnteringVar != -1;
+
 	}
 
 
@@ -368,7 +339,7 @@ public class Tableau {
 	/** Display the current solution */
 	public void displaySolution() {
 
-		System.out.print("z = " + Utility.nf.format(-bestObjective) + ", ");
+		System.out.print("z = " + Utility.nf.format(bestObjective) + ", ");
 
 		String variables = "(";
 		String values = "(";
@@ -474,7 +445,6 @@ public class Tableau {
 		System.out.println();
 
 	}
-
 
 	/**
 	 * Create the tableau used for phase 1 of the simplex algorithm and create the corresponding basis

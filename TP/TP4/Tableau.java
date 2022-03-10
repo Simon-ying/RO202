@@ -144,7 +144,7 @@ public class Tableau {
 		 * En utilisant le théorème dual fort, on peut montrer que l'on obtient des solutions optimales
 		 */
 		/* Si le problème n'est pas sous forme normale, il faut le transformer */
-		boolean normalForm = true;
+		boolean normalForm = false;
 
 		/* Si on résout un problème sous forme normale */
 		if(normalForm) {
@@ -162,8 +162,8 @@ public class Tableau {
 
 			/**** 2nd case - PL Ax <= b, add slack variable and use them as a basis */
 //			Tableau t2 = ex1();
-			Tableau t2 = ex41();
-//			Tableau t2 = ex42();
+//			Tableau t2 = ex41();
+			Tableau t2 = ex42();
 			t2.addSlackAndSolve();
 			t2.displaySolution();
 		}
@@ -262,7 +262,7 @@ public class Tableau {
 			for (int jcol=0; jcol<n; jcol++) {
 				c[jcol] -= A[iraw][jcol] * mul;
 			}
-			bestObjective -= b[iraw] * mul;
+			bestObjective += b[iraw] * mul;
 		}
 	    
 		if(DISPLAY_SIMPLEX_LOGS) {
@@ -368,7 +368,7 @@ public class Tableau {
 	/** Display the current solution */
 	public void displaySolution() {
 
-		System.out.print("z = " + Utility.nf.format(-bestObjective) + ", ");
+		System.out.print("z = " + Utility.nf.format(bestObjective) + ", ");
 
 		String variables = "(";
 		String values = "(";
