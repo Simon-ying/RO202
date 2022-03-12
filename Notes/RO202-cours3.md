@@ -30,7 +30,7 @@ $$
 
 - <font color=red>Théorème 1 :</font> L'ensemble des points extrêmes d'un polytope ou d'un polyèdre convexe correspond à l'ensemble des solutions de base réalisables
 - <font color=red>Théorème 2 :</font> L'optimum d'une fonction linéaire sur un polytope convexe est atteint en au moins un point extrême. S'il est atteint en plusieurs points extrêmes, alors il est atteint en tout point combinaison convexe de ces points extrêmes  
-- <font color=red>Théorème 3 (cas de la maximisation) :</font> Une base réalisable non dégénérée B est une base optimale si et seulement si $\Delta_N\le 0$. <font color=blue>$\Delta_N\ge 0$ en cas de minimisation  </font>
+- <font color=red>Théorème 3 (cas de la maximisation) :</font> Une base réalisable non dégénérée B est une base optimale si et seulement si $\Delta_N\le 0$. <font color=blue>$\Delta_N\ge 0$ en cas de minimisation  </font> ($\Delta_N=c_N-c_BB^{-1}N$)
 
 
 
@@ -74,7 +74,7 @@ Mettre le PL sous forme canonique pour $B$
 
 <font color=red>Remarque: </font>
 
-1. Si l'origine n'est pas réalisable, peut nécessiter une phase préliminaire appelée simplexe phase 1
+1. Si l'origine n'est pas réalisable, peut nécessiter une phase préliminaire appelée **simplexe phase 1**
 2. Si plusieurs variables candidates ont le même ratio, la base suivante sera dégénérée
 3. Si tous les ratios sont négatifs -> problème non borné  
 
@@ -105,7 +105,7 @@ $$
 | :----------------------------: | :-------------: | :-------------: | :-------------------------: |
 |          **Objectif**          |       max       |       min       |        **Objectif**         |
 |                                |      $\le$      |     $\ge0$      |                             |
-|         **Contrainte**         |      $\ge$      |     $\le0$      |          Variable           |
+|         **Contrainte**         |      $\ge$      |     $\le0$      |        **Variable**         |
 |                                |       $=$       | $\in\mathbb{R}$ |                             |
 |                                |     $\ge0$      |      $\ge$      |                             |
 |          **Variable**          |     $\le0$      |      $\le$      |       **Contrainte**        |

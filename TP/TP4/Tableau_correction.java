@@ -1,7 +1,4 @@
-package other;
-
-
-public class Tableau {
+public class Tableau_correction {
 
 	/** Number of variables */
 	public int n;
@@ -35,7 +32,7 @@ public class Tableau {
 	 * @param c
 	 * @param isMinimization
 	 */
-	public Tableau(double[][] A, double[] b, double[] c, boolean isMinimization) {
+	public Tableau_correction(double[][] A, double[] b, double[] c, boolean isMinimization) {
 
 		n = c.length;
 		m = A.length;
@@ -50,7 +47,7 @@ public class Tableau {
 		bestObjective = 0.0;
 	}
 
-	public static Tableau ex1() {
+	public static Tableau_correction ex1() {
 
 		double[][] A = new double[][] {
 			{1, -1},
@@ -61,10 +58,10 @@ public class Tableau {
 		double[] c = new double[]{2, 1};
 		double[] b = new double[]{4, 8, 56};
 
-		return new Tableau(A, b, c, false); 
+		return new Tableau_correction(A, b, c, false); 
 	}
 
-	public static Tableau ex2() {
+	public static Tableau_correction ex2() {
 
 		double[][] A = new double[][] {
 			{1, -2, 1, -1, 0, 0},
@@ -75,7 +72,7 @@ public class Tableau {
 		double[] c = new double[]{2, -3, 5, 0, 0, 0};
 		double[] b = new double[]{4, 6, 7};
 
-		return new Tableau(A, b, c, true); 
+		return new Tableau_correction(A, b, c, true); 
 	}
 
 	public static void main(String[] args) {
@@ -88,18 +85,18 @@ public class Tableau {
 		if(normalForm) {
 
 			/**** 1st case - PL Ax = b and a basis is provided (no slack variable added to the problem) */
-			Tableau t1 = examenTheorieDesJeux();
-			t1.basis = new int[] {3, 4, 5};
-			t1.applySimplex();
+//			Tableau_correction t1 = examenTheorieDesJeux();
+//			t1.basis = new int[] {3, 4, 5};
+//			t1.applySimplex();
 		}
 		
 		/* Si on résout un problème qui n'est pas sous forme normale */
 		else {
 
 			/**** 2nd case - PL Ax <= b, add slack variable and use them as a basis */
-			Tableau t2 = examen2020();
-			t2.addSlackAndSolve();
-			t2.displaySolution();
+//			Tableau_correction t2 = examen2020();
+//			t2.addSlackAndSolve();
+//			t2.displaySolution();
 		}
 	}
 
@@ -111,7 +108,7 @@ public class Tableau {
 
 		/* Create a new tableau in which one slack variable is added for each constraint, 
 		 * and select the slack variables as a base */
-		Tableau tSlack = tableauWithSlack();
+		Tableau_correction tSlack = tableauWithSlack();
 
 		/* Apply the simplex algorithm on the tableau with stack */
 		tSlack.applySimplex();
@@ -323,7 +320,7 @@ public class Tableau {
 	 * (typically, set the solution to the one of the tableau with slack variables after applying the simplex algorithm).
 	 * @param tSlack Tableau which contains the solution
 	 */
-	public void setSolution(Tableau tSlack) {
+	public void setSolution(Tableau_correction tSlack) {
 
 		/* Get the solution of the target tableau */
 		tSlack.getSolution();
@@ -364,7 +361,7 @@ public class Tableau {
 	 * (the base contains the slack variables) 
 	 * @return A tableau with n+m variables (the n original + m slack variables)
 	 */
-	public Tableau tableauWithSlack() {
+	public Tableau_correction tableauWithSlack() {
 
 		double[][] ASlack = new double[m][];
 
@@ -393,7 +390,7 @@ public class Tableau {
 		for(int i = 0; i < m; i++)
 			basis[i] = i + n;
 
-		Tableau slackTableau = new Tableau(ASlack, b, cSlack, isMinimization);
+		Tableau_correction slackTableau = new Tableau_correction(ASlack, b, cSlack, isMinimization);
 		slackTableau.basis = basis;
 
 		return slackTableau;
@@ -450,9 +447,9 @@ public class Tableau {
 	 * Create the tableau used for phase 1 of the simplex algorithm and create the corresponding basis
 	 * @return A tableau with one additional variable for each negative RHS and objective coefficients which correspond to simplex phase 1)
 	 */
-	public Tableau tableauPhase1(int negativeRHSCount) {
+	public Tableau_correction tableauPhase1(int negativeRHSCount) {
 
-		Tableau tSlack = tableauWithSlack();
+		Tableau_correction tSlack = tableauWithSlack();
 
 		double[] cPhase1 = new double[tSlack.n + negativeRHSCount];
 		double[][] APhase1 = new double[m][];
@@ -476,7 +473,7 @@ public class Tableau {
 		}
 
 		/* Create the new tableau */
-		Tableau sPhase1 = new Tableau(APhase1, b, cPhase1, false);
+		Tableau_correction sPhase1 = new Tableau_correction(APhase1, b, cPhase1, false);
 
 		/* Set the basis */
 		negativeId = 0;
@@ -500,7 +497,7 @@ public class Tableau {
 	 */
 	public void applySimplexPhase1And2() {
 
-		Tableau tSlack = tableauWithSlack();
+		Tableau_correction tSlack = tableauWithSlack();
 
 		/* Count the number of negative RHS */
 		int negativeRHS = 0;
@@ -514,7 +511,7 @@ public class Tableau {
 		/* If the 0 vector is not a solution of the simplex */
 		if(negativeRHS > 0) {
 
-			Tableau tPhase1 = tableauPhase1(negativeRHS);
+			Tableau_correction tPhase1 = tableauPhase1(negativeRHS);
 
 			if(DISPLAY_SIMPLEX_LOGS) {
 				System.out.println("\nInitial array: ");

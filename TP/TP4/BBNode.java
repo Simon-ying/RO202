@@ -106,6 +106,16 @@ public class BBNode {
 		//TODO
 		boolean isInt = true;
 		int index = -1;
+		/*
+		 * Si R admet une solution S alors
+		 *     si bestSolution = null ou si S est meilleure que bestSolution alors
+		 *         si S est int alor
+		 *             bestSolution = S
+		 *         sinon
+		 *             id = index de la 1ere variable fractionnaire dans S
+		 *             creer un sommet contenant la contrainte x_id < S(x_id) et brancher dessus
+		 *             creer un sommet contenant la contrainte x_id >= S(x_id) et brancher dessus
+		 */
 		if (tableau.bestSolution != null) {
 			if (tree.bestSolution==null || (tableau.bestObjective < tree.bestObjective && tableau.isMinimization)) {
 				for (int i=0; i<tableau.bestSolution.length; i++) {
@@ -124,10 +134,17 @@ public class BBNode {
 						newAl[i] = 0.0;
 						newAr[i] = 0.0;
 					}
-					newAl[index] = 1;
-					newAr[index] = -1;
-					BBNode newNodel = new BBNode(this, newAl, Math.floor(index));
-					
+					try {
+						newAl[index] = 1;
+						newAr[index] = -1;
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+					}
+					BBNode newNodel = new BBNode(this, Utility.copyArray(newAl), Math.floor(index));
+					BBNode newNoder = new BBNode(this, Utility.copyArray(newAr), -Math.ceil(index));
+					newNodel.branch(tree);
+					newNoder.branch(tree);
 				}
 			}
 

@@ -16,10 +16,6 @@ public class Utility {
 		return Math.abs(Math.round(d) - d) > 1E-6;
 	}
 	
-	public void displaySolution() {
-		
-	}
-	
 	public static double[][] copyArray(double[][] input){
 		
 		double[][] copy = new double[input.length][];
@@ -38,6 +34,17 @@ public class Utility {
 			copy[i] = input[i];
 		
 		return copy;
+	}
+	
+	public static String genSpace(int n) {
+		String spaces = "";
+		if (n < 0) return spaces;
+		else {
+			for (int i=0; i<n; i++) {
+				spaces += " ";
+			}
+			return spaces;
+		}
 	}
 
 }
