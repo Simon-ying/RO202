@@ -57,14 +57,96 @@ public class KnapsackBBNode extends BBNode{
 	private void generateCut() {
 		
 		// TODO
+		List<Integer> cover = new ArrayList<>();
+		if (this.tableau.bestSolution == null)
+			return;
+		int n = this.tableau.n;
+		int coverWeight = 0;
+		int index = 0;
+		while (coverWeight < this.K && index < n) {
+			if (this.tableau.bestSolution[index] > 0) {
+				cover.add(index);
+				coverWeight += this.p[index];
+			}
+			index ++;
+		}
+		if (coverWeight > this.K) {
+			System.out.print(Utility.genSpace(this.depth) + 
+					"Found cover : ");
+			for (int i : cover) {
+				System.out.print((i+1) + " ");
+			}
+			System.out.println();
+			System.out.print(Utility.genSpace(this.depth) + "Relaxation before the cut : ");
+			try {
+				this.tableau.displaySolution();
+			}
+			catch (Exception e) {
+				System.out.println();
+			}
+			this.addCoverCutToTableau(cover);
+			
+			
+			this.tableau.applySimplexPhase1And2();
+			System.out.print(Utility.genSpace(this.depth) + "Relaxation after the cut : ");
+			this.tableau.displaySolution();
+		}
 	}
 
     
 	@Override
 	public void branch(BBTree tree) {
+		/* Solve the linear relaxation */
+		tableau.applySimplexPhase1And2();
+		//TODO
+		int index = -1;
 
-	    // TODO
-	    
+		if (tableau.bestSolution != null) {
+			if (tree.bestSolution==null || (tableau.bestObjective < tree.bestObjective && tableau.isMinimization) || (tableau.bestObjective > tree.bestObjective && !tableau.isMinimization)) {
+				
+				for (int i=0; i<tableau.bestSolution.length; i++) {
+					if (Utility.isFractional(tableau.bestSolution[i])) {
+						index = i;
+						if (this.depth == 0) {
+							System.out.print("root:");
+						}
+						System.out.println("x[" + index + "] = " + Utility.nf.format(tableau.bestSolution[index]));
+						break;
+					}			
+				}
+				if (index == -1)
+				{
+					System.out.print("Integer solution: ");
+					tableau.displaySolution();
+					tree.bestSolution = tableau.bestSolution;
+					tree.bestObjective = tableau.bestObjective;
+				}
+				else {
+					this.generateCut();
+					double newAl[] = new double[tableau.n];
+					double newAr[] = new double[tableau.n];
+					for (int i=0; i<tableau.n; i++) {
+						newAl[i] = 0.0;
+						newAr[i] = 0.0;
+					}
+					newAl[index] = 1;
+					newAr[index] = -1;
+					KnapsackBBNode newNodel = new KnapsackBBNode(this, newAl, Math.floor(tableau.bestSolution[index]), this.p, this.K);
+					KnapsackBBNode newNoder = new KnapsackBBNode(this, newAr, -Math.ceil(tableau.bestSolution[index]), this.p, this.K);
+					System.out.print(Utility.genSpace(this.depth+1) + "x[" + index + "] <= " + Math.floor(tableau.bestSolution[index]) + " : ");
+					newNodel.branch(tree);
+					System.out.print(Utility.genSpace(this.depth+1) + "x[" + index + "] >= " + Math.ceil(tableau.bestSolution[index]) + " : ");
+					newNoder.branch(tree);
+				}
+			}
+			else{
+				System.out.println("Node cut : relaxation worst than bound");
+				System.out.println(Utility.genSpace(this.depth) + "(node relaxation : " + Utility.nf.format(this.tableau.bestObjective) + ", best integer solution : " + (int)tree.bestObjective + ")");
+			}
+		}
+		if (tableau.bestSolution == null) {
+			System.out.println("Node cut : infeasible solution");
+		}
 	}
 
 	/**
