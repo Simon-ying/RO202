@@ -1,0 +1,1 @@
+Pour le ratio test, il faut choisir l'indice dont valeur est le plus petite >=0

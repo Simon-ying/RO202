@@ -37,14 +37,23 @@ public class Utility {
 	}
 	
 	public static String genSpace(int n) {
+		int m = n * 2;
 		String spaces = "";
-		if (n < 0) return spaces;
+		if (m < 0) return spaces;
 		else {
-			for (int i=0; i<n; i++) {
+			for (int i=0; i<m; i++) {
 				spaces += " ";
 			}
 			return spaces;
 		}
+	}
+	
+	public static void print_table(double[] A) {
+		System.out.print("[");
+		for (double i : A) {
+			System.out.print(i+ " ");
+		}
+		System.out.print("]\n");
 	}
 
 }

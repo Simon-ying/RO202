@@ -324,6 +324,11 @@ public class Tableau {
 					sort_index = jraw;
 				}
 			}
+			// Pour le ratio test, il faut choisir l'indice dont valeur est le plus petite >=0
+			else if (Math.abs(b[jraw] / A[jraw][entr_index]) < epsilon && A[jraw][entr_index] > -epsilon) {
+				res = b[jraw] / A[jraw][entr_index];
+				sort_index = jraw;
+			}
 		}
 		if (sort_index == -1) return false;
 		basis[sort_index] = entr_index;

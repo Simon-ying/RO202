@@ -76,7 +76,8 @@ Mettre le PL sous forme canonique pour $B$
 
 1. Si l'origine n'est pas réalisable, peut nécessiter une phase préliminaire appelée **simplexe phase 1**
 2. Si plusieurs variables candidates ont le même ratio, la base suivante sera dégénérée
-3. Si tous les ratios sont négatifs -> problème non borné  
+3. Si tous les ratios sont négatifs -> problème non borné 
+3. <font color=red>Pour le ratio test, il faut choisir l'indice dont valeur est le plus petite >=0</font>
 
 <font color=red>Aspects non abordés dans ce cours: </font>
 

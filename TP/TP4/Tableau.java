@@ -8,7 +8,7 @@ public class Tableau {
 	/** Number of constraints */
 	public int m;
 	
-	public double epsilon = 0.00001;
+	public double epsilon = 1E-6;
 	
 	public double[][] A;
 	public double[] b;
@@ -27,7 +27,7 @@ public class Tableau {
 	public boolean isMinimization;
 
 	/** True if the tableau should be printed at each iteration of the algorithm */
-	public static final boolean DISPLAY_SIMPLEX_LOGS = true;
+	public static final boolean DISPLAY_SIMPLEX_LOGS = false;
 
 	/**
 	 * Create a tableau (the input array are duplicated)
@@ -132,6 +132,21 @@ public class Tableau {
 
 		return new Tableau(A, b, c, true); 
 	}
+	
+	public static Tableau test() {
+
+		double[][] A = new double[][] {
+			{-2, 2},
+			{2, 3},
+			{9, -2},
+			{1, 0}
+
+		};
+		double[] b = new double[] {7, 18, 36, 4};
+		double[] c = new double[] {3, 2};
+
+		return new Tableau(A, b, c, false); 
+	}
 
 	public static void main(String[] args) {
 		/*
@@ -150,9 +165,9 @@ public class Tableau {
 		if(normalForm) {
 
 			/**** 1st case - PL Ax = b and a basis is provided (no slack variable added to the problem) */
-			// Tableau t1 = ex2();
+			 Tableau t1 = ex2();
 			// Tableau t1 = ex41d();
-			Tableau t1 = ex42d();
+//			Tableau t1 = ex42d();
 			t1.basis = new int[] {0, 2, 5};
 			t1.applySimplex();
 		}
@@ -163,7 +178,8 @@ public class Tableau {
 			/**** 2nd case - PL Ax <= b, add slack variable and use them as a basis */
 //			Tableau t2 = ex1();
 //			Tableau t2 = ex41();
-			Tableau t2 = ex42();
+//			Tableau t2 = ex42();
+			Tableau t2 = test();
 			t2.addSlackAndSolve();
 			t2.displaySolution();
 		}
@@ -251,14 +267,16 @@ public class Tableau {
 			b[iraw] /= div;
 			for (int ai=0; ai<m; ai++) {
 				if (ai != iraw) {
-					double mul = (A[ai][basis[iraw]] / A[iraw][basis[iraw]]);
+					double mul1 = (A[ai][basis[iraw]] / A[iraw][basis[iraw]]);
+//					double mul = A[ai][basis[iraw]];
 					for (int j=0; j<n; j++) {
-						A[ai][j] -= A[iraw][j] * mul;
+						A[ai][j] -= A[iraw][j] * mul1;
 					}
-					b[ai] -= b[iraw] * mul;
+					b[ai] -= b[iraw] * mul1;
 				}
 			}
 			double mul = c[basis[iraw]] / A[iraw][basis[iraw]];
+//			double mul = c[basis[iraw]];
 			for (int jcol=0; jcol<n; jcol++) {
 				c[jcol] -= A[iraw][jcol] * mul;
 			}
@@ -287,7 +305,7 @@ public class Tableau {
 		// TODO
 		int entr_index = -1;
 		int sort_index = -1;
-		double res = isMinimization ? Double.MAX_VALUE : 0;
+		double res = 0;
 		for (int icol=0; icol<n; icol++) {
 			if (isMinimization) {
 				if (c[icol] < 0-epsilon && c[icol] <= res-epsilon ) {
@@ -301,6 +319,11 @@ public class Tableau {
 					res = c[icol];
 				}
 			}
+		}
+		if(entr_index != -1) {
+
+			if(DISPLAY_SIMPLEX_LOGS)
+				System.out.println("x" + (entr_index+1) + " enters the base.");
 		}
 		
 		
@@ -316,7 +339,7 @@ public class Tableau {
 		 */
 
 		// TODO
-		res = Double.MAX_VALUE;
+		res = Double.POSITIVE_INFINITY;
 		for (int jraw=0; jraw<m; jraw++) {
 			if (b[jraw] / A[jraw][entr_index] > epsilon) {
 				if (b[jraw] / A[jraw][entr_index] < res - epsilon) {
@@ -324,7 +347,14 @@ public class Tableau {
 					sort_index = jraw;
 				}
 			}
+			// Pour le ratio test, il faut choisir l'indice dont valeur est le plus petite >=0
+			else if (Math.abs(b[jraw] / A[jraw][entr_index]) < epsilon && A[jraw][entr_index] > -epsilon) {
+				res = b[jraw] / A[jraw][entr_index];
+				sort_index = jraw;
+			}
 		}
+		if(DISPLAY_SIMPLEX_LOGS)
+			System.out.println("x" + (basis[sort_index]+1) + " leaves the base.");
 		if (sort_index == -1) return false;
 		basis[sort_index] = entr_index;
 		

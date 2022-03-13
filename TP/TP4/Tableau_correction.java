@@ -74,6 +74,21 @@ public class Tableau_correction {
 
 		return new Tableau_correction(A, b, c, true); 
 	}
+	
+	public static Tableau_correction test() {
+
+		double[][] A = new double[][] {
+			{-2, 2},
+			{2, 3},
+			{9, -2},
+			{1, 0}
+
+		};
+		double[] b = new double[] {7, 18, 36, 4};
+		double[] c = new double[] {3, 2};
+
+		return new Tableau_correction(A, b, c, false); 
+	}
 
 	public static void main(String[] args) {
 
@@ -85,18 +100,19 @@ public class Tableau_correction {
 		if(normalForm) {
 
 			/**** 1st case - PL Ax = b and a basis is provided (no slack variable added to the problem) */
-//			Tableau_correction t1 = examenTheorieDesJeux();
-//			t1.basis = new int[] {3, 4, 5};
-//			t1.applySimplex();
+			Tableau_correction t1 = ex2();
+			t1.basis = new int[] {3, 4, 5};
+			t1.applySimplex();
 		}
 		
 		/* Si on résout un problème qui n'est pas sous forme normale */
 		else {
 
 			/**** 2nd case - PL Ax <= b, add slack variable and use them as a basis */
-//			Tableau_correction t2 = examen2020();
-//			t2.addSlackAndSolve();
-//			t2.displaySolution();
+//			Tableau_correction t2 = ex1();
+			Tableau_correction t2 = test();
+			t2.addSlackAndSolve();
+			t2.displaySolution();
 		}
 	}
 

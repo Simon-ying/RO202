@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
+
 
 /**
  * Represents a node of a branch-and-bound tree.
@@ -7,6 +6,7 @@ import java.util.List;
 public class BBNode {
 
 	/** The tableau associated to the relaxation of this node */
+//	Tableau_correction tableau;
 	Tableau tableau;
 	
 	/** The current depth of the node (only used to display the tree with an indentation) */
@@ -22,6 +22,7 @@ public class BBNode {
 	public BBNode(double[][] A, double[] rhs, double[] obj, boolean isMinimisation) {
 		
 		/* Create the tableau associated to the root problem */
+//		tableau = new Tableau_correction(A, rhs, obj, isMinimisation);
 		tableau = new Tableau(A, rhs, obj, isMinimisation);
 		depth = 0;
 	}
@@ -61,6 +62,7 @@ public class BBNode {
 		newMRhs[m - 1] = newRhs;
 
 		/* Create the tableau with this additional constraint */
+//		tableau = new Tableau_correction(newMA, newMRhs, parent.tableau.c, parent.tableau.isMinimization);
 		tableau = new Tableau(newMA, newMRhs, parent.tableau.c, parent.tableau.isMinimization);
 
 	}
@@ -73,7 +75,6 @@ public class BBNode {
 
 		/* Solve the linear relaxation */
 		tableau.applySimplexPhase1And2();
-		
 		/* I - Description des variables et de leurs attributs que vous devrez utiliser
 		 * - Variable tableau : représente le programme linéaire associé à ce sommet (c'est donc un problème continu). Ses attributs sont :
 		 *    - bestSolution (tableau de double) : solution optimale continue trouvée (null si le PL est infaisable) ;
@@ -104,7 +105,6 @@ public class BBNode {
   		 * 
 		 */
 		//TODO
-		boolean isInt = true;
 		int index = -1;
 		/*
 		 * Si R admet une solution S alors
@@ -117,16 +117,25 @@ public class BBNode {
 		 *             creer un sommet contenant la contrainte x_id >= S(x_id) et brancher dessus
 		 */
 		if (tableau.bestSolution != null) {
-			if (tree.bestSolution==null || (tableau.bestObjective < tree.bestObjective && tableau.isMinimization)) {
+			if (tree.bestSolution==null || (tableau.bestObjective < tree.bestObjective && tableau.isMinimization) || (tableau.bestObjective > tree.bestObjective && !tableau.isMinimization)) {
+				
 				for (int i=0; i<tableau.bestSolution.length; i++) {
 					if (Utility.isFractional(tableau.bestSolution[i])) {
-						isInt = false;
 						index = i;
+						if (this.depth == 0) {
+							System.out.print("root:");
+						}
+						System.out.println("x[" + index + "] = " + Utility.nf.format(tableau.bestSolution[index]));
 						break;
 					}			
 				}
-				if (isInt)
+				if (index == -1)
+				{
+					System.out.print("Integer solution: ");
+					tableau.displaySolution();
 					tree.bestSolution = tableau.bestSolution;
+					tree.bestObjective = tableau.bestObjective;
+				}
 				else {
 					double newAl[] = new double[tableau.n];
 					double newAr[] = new double[tableau.n];
@@ -134,22 +143,28 @@ public class BBNode {
 						newAl[i] = 0.0;
 						newAr[i] = 0.0;
 					}
-					try {
-						newAl[index] = 1;
-						newAr[index] = -1;
-					}
-					catch (Exception e) {
-						e.printStackTrace();
-					}
-					BBNode newNodel = new BBNode(this, Utility.copyArray(newAl), Math.floor(index));
-					BBNode newNoder = new BBNode(this, Utility.copyArray(newAr), -Math.ceil(index));
+					newAl[index] = 1;
+					newAr[index] = -1;
+
+					BBNode newNodel = new BBNode(this, newAl, Math.floor(tableau.bestSolution[index]));
+					BBNode newNoder = new BBNode(this, newAr, -Math.ceil(tableau.bestSolution[index]));
+//					newNodel.tableau.applySimplexPhase1And2();
+//					newNodel.tableau.displaySolution();
+					System.out.print(Utility.genSpace(this.depth+1) + "x[" + index + "] <= " + Math.floor(tableau.bestSolution[index]) + " : ");
 					newNodel.branch(tree);
+					System.out.print(Utility.genSpace(this.depth+1) + "x[" + index + "] >= " + Math.ceil(tableau.bestSolution[index]) + " : ");
 					newNoder.branch(tree);
 				}
 			}
-
-			
+			else{
+				System.out.println("Node cut : relaxation worst than bound");
+				System.out.println(Utility.genSpace(this.depth) + "(node relaxation : " + Utility.nf.format(this.tableau.bestObjective) + ", best integer solution : " + (int)tree.bestObjective + ")");
+			}
 		}
+		if (tableau.bestSolution == null) {
+			System.out.println("Node cut : infeasible solution");
+		}
+		
 	}
 
 }
